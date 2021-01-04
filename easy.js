@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const { match } = require('assert');
 
 const movies = [
 	{
@@ -194,6 +195,24 @@ const theaters = [
 	}
 ];
 
+/* MAS VOTADAS - VARIABLES */
+
+let mayorSiete = movies.filter((pelicula)=>{
+	return pelicula.vote_average >= 7;
+});
+
+let ratingMayorSiete = mayorSiete.map((pelicula)=>{
+	return pelicula.vote_average;
+});
+
+let sumaRating = ratingMayorSiete.reduce((acum,rating)=>{
+	return acum+rating;
+});
+
+let promedioRating = sumaRating / ratingMayorSiete.length;
+let promedioRedondo =  Math.round(promedioRating * 100) / 100;
+
+
 // Servidor
 http.createServer((req, res) => {
 	res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -242,22 +261,12 @@ http.createServer((req, res) => {
             res.end();
 			break;
 		case '/mas-votadas':
-
-			/* let mayorSiete >= 7
-
-			let mayorSiete = movies.filter((pelicula)=>{
-				return pelicula.vote_average >= 7;
-			});
-			let ratingMayorSiete = mayorSiete.map((pelicula)=>{
-				return pelicula.vote_average;
-			});
-			let sumaRating = ratingMayorSiete.reduce((acum, rating)=>{
-				return acum + rating;
-			});
-			let promedioRating = sumaRating / ratingMayorSiete.length;
-			let promedioRedondo = Math.round(promedioRating * 100) / 100;
-		
-			break; */
+			res.write(`Mas votadas. \n\nHay ${mayorSiete.length} peliculas. \nEl rating de estas peliculas es de ${promedioRedondo}. \n\n\n`)
+			mayorSiete.forEach((pelicula)=>{
+				res.write(`Titulo:${pelicula.title}\nRating: ${pelicula.vote_average}\nReseña: ${pelicula.overview}\n\n`)
+			})
+			res.end();
+			break;
 		case '/sucursales':
 			res.write('Nuestras Salas');
             res.write('\n\n\n')
